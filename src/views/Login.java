@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controller.UsuarioController;
+
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,6 +32,7 @@ public class Login extends JFrame {
 	private JPasswordField txtContrasena;
 	int xMouse, yMouse;
 	private JLabel labelExit;
+	private UsuarioController usuarioController;
 
 	/**
 	 * Launch the application.
@@ -109,6 +113,7 @@ public class Login extends JFrame {
 		labelExit.setHorizontalAlignment(SwingConstants.CENTER);		
 		
 		txtUsuario = new JTextField();
+		txtUsuario.setText("Ingrese su nombre de usuario");
 		txtUsuario.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -123,7 +128,6 @@ public class Login extends JFrame {
 			}
 		});
 		txtUsuario.setFont(new Font("Roboto", Font.PLAIN, 16));
-		txtUsuario.setText("Ingrese su nombre de usuario");
 		txtUsuario.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		txtUsuario.setForeground(SystemColor.activeCaptionBorder);
 		txtUsuario.setBounds(65, 256, 324, 32);
@@ -235,12 +239,13 @@ public class Login extends JFrame {
 	}
 	
 	private void Login() {
-		 String Usuario= "admin";
-	     String Contraseña="admin";
+		 String usuario= txtUsuario.getText();
+	     String contrasena=new String(txtContrasena.getPassword());
+	     
+	     this.usuarioController = new UsuarioController();
+	     Boolean statusUsuario = this.usuarioController.consultaUsuario(usuario, contrasena);
 
-	        String contrase=new String (txtContrasena.getPassword());
-
-	        if(txtUsuario.getText().equals(Usuario) && contrase.equals(Contraseña)){
+	        if( statusUsuario ){
 	            MenuUsuario menu = new MenuUsuario();
 	            menu.setVisible(true);
 	            dispose();	 
