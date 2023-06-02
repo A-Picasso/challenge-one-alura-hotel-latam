@@ -18,7 +18,12 @@ import modelo.Reserva;
 import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+
+import java.text.DecimalFormat;
 import java.text.Format;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -44,6 +49,7 @@ public class ReservasView extends JFrame {
 	private JLabel labelAtras;
 	private Double valor;
 	private ReservaController reservaController;
+	private int estadia = 1000;
 
 	/**
 	 * Launch the application.
@@ -260,6 +266,11 @@ public class ReservasView extends JFrame {
 		txtFechaEntrada.setBorder(new LineBorder(SystemColor.window));
 		txtFechaEntrada.setDateFormatString("yyyy-MM-dd");
 		txtFechaEntrada.setFont(new Font("Roboto", Font.PLAIN, 18));
+		txtFechaEntrada.addPropertyChangeListener(new PropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent evt) {
+				valorDeReserva(txtFechaEntrada, txtFechaSalida);
+			}
+		});
 		panel.add(txtFechaEntrada);
 
 		txtFechaSalida = new JDateChooser();
@@ -271,7 +282,7 @@ public class ReservasView extends JFrame {
 		txtFechaSalida.setFont(new Font("Roboto", Font.PLAIN, 18));
 		txtFechaSalida.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
-				//Activa el evento, después del usuario seleccionar las fechas se debe calcular el valor de la reserva
+				valorDeReserva(txtFechaEntrada, txtFechaSalida);
 			}
 		});
 		txtFechaSalida.setDateFormatString("yyyy-MM-dd");
@@ -321,7 +332,31 @@ public class ReservasView extends JFrame {
 
 	}
 	
-	private void valorDeReserva() {
+	private void valorDeReserva(JDateChooser fechaEntrada, JDateChooser fechaSalida) {
+		
+		if(fechaEntrada.getDate() !=null && fechaSalida.getDate() !=null ) {
+			if(fechaEntrada.getDate().after(fechaSalida.getDate())) {
+				JOptionPane.showMessageDialog(null, "La fecha de CheckOut no puede ser posterior a la fecha de CheckIn",
+						"Error en las fechas", JOptionPane.ERROR_MESSAGE);
+				fechaEntrada.setDate(null);
+				fechaSalida.setDate(null);
+				return;
+			}
+						
+			Calendar inicio = fechaEntrada.getCalendar();
+			Calendar fin = fechaSalida.getCalendar();
+			int dias = -1;
+			
+			
+			while(inicio.before(fin) || inicio.equals(fin)) {
+				inicio.add(Calendar.DATE, 1);
+				dias++;
+			}
+			
+			valor = (double) (dias * estadia);
+			DecimalFormat df = new DecimalFormat("#0.00");
+			txtValor.setText("$" + df.format(valor));
+		}
 		
 	}
 	
@@ -329,14 +364,20 @@ public class ReservasView extends JFrame {
 		String fechaEntrada = ((JTextField)txtFechaEntrada.getDateEditor().getUiComponent()).getText();
 		String fechaSalida = ((JTextField)txtFechaSalida.getDateEditor().getUiComponent()).getText();
 		
-		Reserva nuevaReserva = new Reserva(Date.valueOf(fechaEntrada), Date.valueOf(fechaSalida), valor, txtFormaPago.getSelectedItem().toString());
-		this.reservaController.guardar(nuevaReserva);
+		System.out.println(Date.valueOf(fechaEntrada));
+		System.out.println(Date.valueOf(fechaSalida));
+		System.out.println(valor.toString());
+		System.out.println(txtFormaPago.getSelectedItem().toString());
 		
-		RegistroHuesped registro = new RegistroHuesped();
+		Reserva nuevaReserva = new Reserva(Date.valueOf(fechaEntrada), Date.valueOf(fechaSalida), valor, txtFormaPago.getSelectedItem().toString());
+		reservaController.guardar(nuevaReserva);
+		
+		RegistroHuesped registro = new RegistroHuesped(nuevaReserva.getId());
 		registro.setVisible(true);
 		dispose();
 	}
-		
+	
+	
 	//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"	
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
 	        xMouse = evt.getX();

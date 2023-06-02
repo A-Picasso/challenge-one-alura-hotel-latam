@@ -39,7 +39,6 @@ public class ReservaDAO {
 		try ( resultSet ) {
 			while ( resultSet.next() ) {
 				reserva.setId(resultSet.getInt(1));
-				System.out.println(String.format("Fue insertada la reserva:%s", reserva));
 			}
 		}
 	}
