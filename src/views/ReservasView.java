@@ -50,7 +50,8 @@ public class ReservasView extends JFrame {
 	private Double valor;
 	private ReservaController reservaController;
 	private int estadia = 1000;
-
+	
+	
 	/**
 	 * Launch the application.
 	 */
@@ -72,6 +73,7 @@ public class ReservasView extends JFrame {
 	 */
 	public ReservasView() {
 		super("Reserva");
+		this.reservaController = new ReservaController();
 		setIconImage(Toolkit.getDefaultToolkit().getImage(ReservasView.class.getResource("/imagenes/aH-40px.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 910, 560);
@@ -347,7 +349,6 @@ public class ReservasView extends JFrame {
 			Calendar fin = fechaSalida.getCalendar();
 			int dias = -1;
 			
-			
 			while(inicio.before(fin) || inicio.equals(fin)) {
 				inicio.add(Calendar.DATE, 1);
 				dias++;
@@ -364,14 +365,9 @@ public class ReservasView extends JFrame {
 		String fechaEntrada = ((JTextField)txtFechaEntrada.getDateEditor().getUiComponent()).getText();
 		String fechaSalida = ((JTextField)txtFechaSalida.getDateEditor().getUiComponent()).getText();
 		
-		System.out.println(Date.valueOf(fechaEntrada));
-		System.out.println(Date.valueOf(fechaSalida));
-		System.out.println(valor.toString());
-		System.out.println(txtFormaPago.getSelectedItem().toString());
-		
 		Reserva nuevaReserva = new Reserva(Date.valueOf(fechaEntrada), Date.valueOf(fechaSalida), valor, txtFormaPago.getSelectedItem().toString());
-		reservaController.guardar(nuevaReserva);
-		
+		this.reservaController.guardar(nuevaReserva);
+	
 		RegistroHuesped registro = new RegistroHuesped(nuevaReserva.getId());
 		registro.setVisible(true);
 		dispose();
