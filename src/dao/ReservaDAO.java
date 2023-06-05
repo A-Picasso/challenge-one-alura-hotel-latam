@@ -45,7 +45,7 @@ public class ReservaDAO {
 		}
 	}
 	
-	public List<Reserva> listarReservas(){
+	public List<Reserva> listar(){
 		List<Reserva> resultado = new ArrayList<>();
 		try {
 			final PreparedStatement statement = con.prepareStatement("SELECT id, fecha_entrada, fecha_salida, valor, forma_pago FROM reservas");
@@ -54,7 +54,8 @@ public class ReservaDAO {
 				final ResultSet rst = statement.getResultSet();
 				try( rst ){
 					while( rst.next() ) {
-						Reserva fila = new Reserva(rst.getInt("id"), rst.getDate("fecha_entrada"), rst.getDate("fecha_salida"), rst.getDouble("valor"), rst.getString("forma_pago"));
+						Reserva fila = new Reserva(rst.getInt("id"), rst.getDate("fecha_entrada"), rst.getDate("fecha_salida"), 
+										rst.getDouble("valor"), rst.getString("forma_pago"));
 						resultado.add(fila);
 					}
 				}
@@ -76,7 +77,8 @@ public class ReservaDAO {
 				final ResultSet rst = statement.getResultSet();
 				try( rst ){
 					while( rst.next() ) {
-						Reserva fila = new Reserva(rst.getInt("id"), rst.getDate("fecha_entrada"), rst.getDate("fecha_salida"), rst.getDouble("valor"), rst.getString("forma_pago"));
+						Reserva fila = new Reserva(rst.getInt("id"), rst.getDate("fecha_entrada"), rst.getDate("fecha_salida"), 
+									rst.getDouble("valor"), rst.getString("forma_pago"));
 						resultadoId.add( fila );
 					}
 				}

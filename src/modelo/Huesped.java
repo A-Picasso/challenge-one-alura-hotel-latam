@@ -24,15 +24,15 @@ public class Huesped {
 	}
 
 
-	public Huesped(Integer id, Integer idReserva, String nombre, String apellido, 
-			Date fechaNacimiento, String nacionalidad, String telefono) {
+	public Huesped(Integer id, String nombre, String apellido, Date fechaNacimiento, 
+			String nacionalidad, String telefono, Integer idReserva) {
 		this.id = id;
-		this.idReserva = idReserva;
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.fechaNacimiento = fechaNacimiento;
 		this.nacionalidad = nacionalidad;
 		this.telefono = telefono;
+		this.idReserva = idReserva;
 	}
 
 

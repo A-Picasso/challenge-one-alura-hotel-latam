@@ -19,8 +19,8 @@ public class ReservaController {
 		this.reservaDao.guardar(reserva);
 	}
 	
-	public List<Reserva> listarReservas(){
-		return this.reservaDao.listarReservas();
+	public List<Reserva> listar(){
+		return this.reservaDao.listar();
 	}
 
 	public List<Reserva> buscarPorId( String id ){

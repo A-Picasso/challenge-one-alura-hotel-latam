@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import modelo.Huesped;
 
@@ -43,6 +45,51 @@ public class HuespedDAO {
 				huesped.setId(resultSet.getInt(1));
 			}
 		}
+	}
+	
+	
+	public List<Huesped> listar(){
+		List<Huesped> listarResultado = new ArrayList<>();
+		try {
+			final PreparedStatement statement = con.prepareStatement("SELECT id, nombre, apellido, fecha_nacimiento, nacionalidad, telefono, id_reserva FROM huespedes");
+			try( statement ){
+				statement.execute();
+				final ResultSet rst = statement.getResultSet();
+				try( rst ){
+					while( rst.next() ){
+						Huesped fila = new Huesped(rst.getInt("id"), rst.getString("nombre"), rst.getString("apellido"), rst.getDate("fecha_nacimiento"), 
+									rst.getString("nacionalidad"), rst.getString("telefono"), rst.getInt("id_reserva"));
+						listarResultado.add(fila);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return listarResultado;
+	}
+	
+	
+	public List<Huesped> listarPorApellido( String apellido ){
+		List<Huesped> resultado = new ArrayList<>();
+		try {
+			final PreparedStatement statement = con.prepareStatement("SELECT id, nombre, apellido, fecha_nacimiento, nacionalidad, telefono, id_reserva FROM huespedes WHERE apellido=?");
+			try( statement ){
+				statement.setString(1, apellido);
+				statement.execute();
+				final ResultSet rst = statement.getResultSet();
+				try( rst ){
+					while( rst.next() ) {
+						Huesped fila = new Huesped(rst.getInt("id"), rst.getString("nombre"), rst.getString("apellido"), rst.getDate("fecha_nacimiento"), 
+									rst.getString("nacionalidad"), rst.getString("telefono"), rst.getInt("id_reserva"));
+						resultado.add(fila);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return resultado;
 	}
 
 }

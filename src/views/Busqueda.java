@@ -6,11 +6,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
-
 import controller.HuespedController;
 import controller.ReservaController;
+import modelo.Huesped;
 import modelo.Reserva;
-
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -19,7 +18,6 @@ import java.awt.Color;
 import java.awt.SystemColor;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -98,7 +96,7 @@ public class Busqueda extends JFrame {
 				} else if( panel.getSelectedIndex() == 1 ) {
 					txtBuscar.setText("BUSCAR POR APELLIDO");
 					limpiarTabla(modeloHuesped);	
-					
+					cargarTbHuespedes();
 				}
 			}
 		});
@@ -169,6 +167,7 @@ public class Busqueda extends JFrame {
 		modeloHuesped.addColumn("Nacionalidad");
 		modeloHuesped.addColumn("Telefono");
 		modeloHuesped.addColumn("Número de Reserva");
+		cargarTbHuespedes();
 		
 		
 		JScrollPane scroll_tableHuespedes = new JScrollPane(tbHuespedes);
@@ -279,11 +278,24 @@ public class Busqueda extends JFrame {
 						cargarTbReservasPorId();
 						limpiarBuscador();
 					} else {
-						JOptionPane.showMessageDialog(null, "Reservas - Ingresa el ID a buscar",
+						JOptionPane.showMessageDialog(null, "Reserva - Ingresa el ID a buscar",
 								"¡Ingrese un criterio de busqueda valido!", JOptionPane.WARNING_MESSAGE);
 						txtBuscar.requestFocus();
 						limpiarTabla(modelo);
 						cargarTbReservas();
+					}
+					break;
+				case 1:
+					if( !txtBuscar.getText().isEmpty() ) {
+						limpiarTabla(modeloHuesped);
+						cargarTbHuespedesPorApellido();
+						limpiarBuscador();
+					} else {
+						JOptionPane.showMessageDialog(null, "Huesped - Ingresa el Apellido a buscar",
+								"¡Ingrese un criterio de busqueda valido!", JOptionPane.WARNING_MESSAGE);
+						txtBuscar.requestFocus();
+						limpiarTabla(modeloHuesped);
+						cargarTbHuespedes();
 					}
 					break;
 				}
@@ -336,18 +348,37 @@ public class Busqueda extends JFrame {
 	
 	
 	private void cargarTbReservas() {
-		List<Reserva> listaReserva = this.reservaController.listarReservas();
+		List<Reserva> listaReserva = this.reservaController.listar();
 		listaReserva.forEach( reserva -> modelo.addRow( new Object[] {
 				reserva.getId(), reserva.getFechaEntrada(), reserva.getFechaSalida(),
 				reserva.getValor(), reserva.getFormaPago()
 		}) );
 	}
 	
+	
 	private void cargarTbReservasPorId() {
 		List<Reserva> listaReservaId = this.reservaController.buscarPorId(txtBuscar.getText());
 		listaReservaId.forEach( reserva -> modelo.addRow( new Object[] {
 				reserva.getId(), reserva.getFechaEntrada(), reserva.getFechaSalida(),
 				reserva.getValor(), reserva.getFormaPago()
+		}) );
+	}
+	
+	
+	private void cargarTbHuespedes() {
+		List<Huesped> listaHuespedes = this.huespedController.listar();
+		listaHuespedes.forEach( huesped -> modeloHuesped.addRow( new Object[] {
+				huesped.getId(), huesped.getNombre(), huesped.getApellido(), huesped.getFechaNacimiento(),
+				huesped.getNacionalidad(), huesped.getTelefono(), huesped.getIdReserva()
+		}) );
+	}
+	
+	
+	private void cargarTbHuespedesPorApellido() {
+		List<Huesped> listarHuespedApellido = this.huespedController.listarPorApellido(txtBuscar.getText());
+		listarHuespedApellido.forEach( huesped -> modeloHuesped.addRow( new Object[] {
+				huesped.getId(), huesped.getNombre(), huesped.getApellido(), huesped.getFechaNacimiento(),
+				huesped.getNacionalidad(), huesped.getTelefono(), huesped.getIdReserva()
 		}) );
 	}
 	
