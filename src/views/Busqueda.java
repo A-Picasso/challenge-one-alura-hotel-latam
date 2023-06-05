@@ -6,6 +6,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import controller.HuespedController;
+import controller.ReservaController;
+import modelo.Reserva;
+
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -13,8 +18,11 @@ import javax.swing.ImageIcon;
 import java.awt.Color;
 import java.awt.SystemColor;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
@@ -25,6 +33,7 @@ import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.KeyAdapter;
 
 @SuppressWarnings("serial")
 public class Busqueda extends JFrame {
@@ -37,6 +46,8 @@ public class Busqueda extends JFrame {
 	private DefaultTableModel modeloHuesped;
 	private JLabel labelAtras;
 	private JLabel labelExit;
+	private ReservaController reservaController;
+	private HuespedController huespedController;
 	int xMouse, yMouse;
 
 	/**
@@ -59,6 +70,8 @@ public class Busqueda extends JFrame {
 	 * Create the frame.
 	 */
 	public Busqueda() {
+		this.reservaController = new ReservaController();
+		this.huespedController = new HuespedController();
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Busqueda.class.getResource("/imagenes/lupa2.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 910, 571);
@@ -70,26 +83,64 @@ public class Busqueda extends JFrame {
 		setLocationRelativeTo(null);
 		setUndecorated(true);
 		
-		txtBuscar = new JTextField();
-		txtBuscar.setBounds(536, 127, 193, 31);
-		txtBuscar.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		contentPane.add(txtBuscar);
-		txtBuscar.setColumns(10);
-		
-		
-		JLabel lblNewLabel_4 = new JLabel("SISTEMA DE BÚSQUEDA");
-		lblNewLabel_4.setForeground(new Color(12, 138, 199));
-		lblNewLabel_4.setFont(new Font("Roboto Black", Font.BOLD, 24));
-		lblNewLabel_4.setBounds(331, 62, 280, 42);
-		contentPane.add(lblNewLabel_4);
-		
 		JTabbedPane panel = new JTabbedPane(JTabbedPane.TOP);
 		panel.setBackground(new Color(12, 138, 199));
 		panel.setFont(new Font("Roboto", Font.PLAIN, 16));
 		panel.setBounds(20, 169, 865, 328);
 		contentPane.add(panel);
-
+		panel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if( panel.getSelectedIndex() == 0 ) {
+					txtBuscar.setText("BUSCAR POR ID");
+					limpiarTabla(modelo);
+					cargarTbReservas();
+				} else if( panel.getSelectedIndex() == 1 ) {
+					txtBuscar.setText("BUSCAR POR APELLIDO");
+					limpiarTabla(modeloHuesped);	
+					
+				}
+			}
+		});
 		
+		txtBuscar = new JTextField("BUSCAR POR ID");
+		txtBuscar.setBounds(536, 127, 193, 31);
+		txtBuscar.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+		contentPane.add(txtBuscar);
+		txtBuscar.setColumns(10);
+		txtBuscar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if( txtBuscar.getText().equals("BUSCAR POR ID") || txtBuscar.getText().equals("BUSCAR POR APELLIDO") ) {
+					limpiarBuscador();
+				}
+			}
+		});
+		txtBuscar.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent evt) {
+				int numTabla = panel.getSelectedIndex();
+				
+				switch( numTabla ) {
+				case 0:
+					if(Character.isLetter(evt.getKeyChar()) || (evt.getKeyChar()==KeyEvent.VK_SPACE) || (evt.getKeyChar()==KeyEvent.VK_BACK_SPACE)){
+				          evt.consume();
+				      }
+					break;
+				case 1:
+					if(!Character.isLetter(evt.getKeyChar()) && !(evt.getKeyChar()==KeyEvent.VK_SPACE) && !(evt.getKeyChar()==KeyEvent.VK_BACK_SPACE)){
+				          evt.consume();
+				      }
+					break;
+				}
+			}
+		});
+		
+		JLabel lblNewLabel_4 = new JLabel("SISTEMA DE BÚSQUEDA");
+		lblNewLabel_4.setForeground(new Color(12, 138, 199));
+		lblNewLabel_4.setFont(new Font("Roboto Black", Font.BOLD, 24));
+		lblNewLabel_4.setBounds(331, 62, 303, 42);
+		contentPane.add(lblNewLabel_4);
 		
 		
 		tbReservas = new JTable();
@@ -104,6 +155,7 @@ public class Busqueda extends JFrame {
 		JScrollPane scroll_table = new JScrollPane(tbReservas);
 		panel.addTab("Reservas", new ImageIcon(Busqueda.class.getResource("/imagenes/reservado.png")), scroll_table, null);
 		scroll_table.setVisible(true);
+		cargarTbReservas();
 		
 		
 		tbHuespedes = new JTable();
@@ -117,6 +169,8 @@ public class Busqueda extends JFrame {
 		modeloHuesped.addColumn("Nacionalidad");
 		modeloHuesped.addColumn("Telefono");
 		modeloHuesped.addColumn("Número de Reserva");
+		
+		
 		JScrollPane scroll_tableHuespedes = new JScrollPane(tbHuespedes);
 		panel.addTab("Huéspedes", new ImageIcon(Busqueda.class.getResource("/imagenes/pessoas.png")), scroll_tableHuespedes, null);
 		scroll_tableHuespedes.setVisible(true);
@@ -216,6 +270,23 @@ public class Busqueda extends JFrame {
 		btnbuscar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				int numTabla = panel.getSelectedIndex();
+				
+				switch( numTabla ) {
+				case 0:
+					if( !txtBuscar.getText().isEmpty() ) {
+						limpiarTabla(modelo);
+						cargarTbReservasPorId();
+						limpiarBuscador();
+					} else {
+						JOptionPane.showMessageDialog(null, "Reservas - Ingresa el ID a buscar",
+								"¡Ingrese un criterio de busqueda valido!", JOptionPane.WARNING_MESSAGE);
+						txtBuscar.requestFocus();
+						limpiarTabla(modelo);
+						cargarTbReservas();
+					}
+					break;
+				}
 
 			}
 		});
@@ -224,6 +295,7 @@ public class Busqueda extends JFrame {
 		btnbuscar.setBounds(748, 125, 122, 35);
 		btnbuscar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnbuscar);
+		
 		
 		JLabel lblBuscar = new JLabel("BUSCAR");
 		lblBuscar.setBounds(0, 0, 122, 35);
@@ -261,6 +333,33 @@ public class Busqueda extends JFrame {
 		btnEliminar.add(lblEliminar);
 		setResizable(false);
 	}
+	
+	
+	private void cargarTbReservas() {
+		List<Reserva> listaReserva = this.reservaController.listarReservas();
+		listaReserva.forEach( reserva -> modelo.addRow( new Object[] {
+				reserva.getId(), reserva.getFechaEntrada(), reserva.getFechaSalida(),
+				reserva.getValor(), reserva.getFormaPago()
+		}) );
+	}
+	
+	private void cargarTbReservasPorId() {
+		List<Reserva> listaReservaId = this.reservaController.buscarPorId(txtBuscar.getText());
+		listaReservaId.forEach( reserva -> modelo.addRow( new Object[] {
+				reserva.getId(), reserva.getFechaEntrada(), reserva.getFechaSalida(),
+				reserva.getValor(), reserva.getFormaPago()
+		}) );
+	}
+	
+	private void limpiarBuscador() {
+		txtBuscar.setText("");
+	}
+	
+	private void limpiarTabla( DefaultTableModel table ) {
+		table.getDataVector().clear();
+	}
+	
+	
 	
 //Código que permite mover la ventana por la pantalla según la posición de "x" y "y"
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
