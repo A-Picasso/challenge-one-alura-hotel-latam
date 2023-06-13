@@ -19,6 +19,7 @@ public class ReservaDAO {
 		this.con = con;
 	}
 	
+	
 	public void guardar( Reserva reserva ) {
 		try {
 			final PreparedStatement statement = con.prepareStatement("INSERT INTO reservas(fecha_entrada, fecha_salida, valor, forma_pago)" + 
@@ -27,10 +28,11 @@ public class ReservaDAO {
 				ejecutarRegistro( reserva, statement );
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException("Error de ejecucion: " + e.getMessage(),e);
+			throw new RuntimeException("Ocurrió una excepción en el método guardar de la clase ReservaDao: " + e.getMessage(), e);
 		}
 	}
 
+	
 	private void ejecutarRegistro(Reserva reserva, PreparedStatement statement) throws SQLException  {
 		statement.setDate(1, reserva.getFechaEntrada());
 		statement.setDate(2, reserva.getFechaSalida());
@@ -45,6 +47,7 @@ public class ReservaDAO {
 			}
 		}
 	}
+	
 	
 	public List<Reserva> listar(){
 		List<Reserva> resultado = new ArrayList<>();
@@ -62,7 +65,7 @@ public class ReservaDAO {
 				}
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Ocurrió una excepción en el método listar de la clase ReservaDao: " + e.getMessage(), e);
 		}
 		return resultado;
 	}
@@ -85,12 +88,13 @@ public class ReservaDAO {
 				}
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Ocurrió una excepción en el método buscarPorId de la clase ReservaDao: " + e.getMessage(), e);
 		}
 		return resultadoId;
 	}
 	
-	public int actualizar( Date fechaEntrada, Date fechaSalida, Double valor, String formaPago, Integer id ) {
+	
+	public void actualizar( Date fechaEntrada, Date fechaSalida, Double valor, String formaPago, Integer id ) {
 		try {
 			final PreparedStatement statement = con.prepareStatement(
 												"UPDATE reservas SET " + 
@@ -106,13 +110,23 @@ public class ReservaDAO {
 				statement.setString(4, formaPago);
 				statement.setInt(5, id);
 				statement.execute();
-				
-				int contadorActualizaciones = statement.getUpdateCount();
-				return contadorActualizaciones;
+			
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException("Ocurrió una excepción en ReservaDao" + e.getMessage(), e);
+			throw new RuntimeException("Ocurrió una excepción en el método actualizar de la clase ReservaDao" + e.getMessage(), e);
 		}
 	}
 
+	
+	public void eliminar( Integer id ) {
+		try {
+			final PreparedStatement statement = con.prepareStatement("DELETE FROM reservas WHERE id=?");
+			try( statement ){
+				statement.setInt(1, id);
+				statement.execute();
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Ocurrió una excepción en el método eliminar de la clase ReservaDao: " + e.getMessage(), e);
+		}
+	}
 }

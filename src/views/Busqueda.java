@@ -369,6 +369,27 @@ public class Busqueda extends JFrame {
 		lblEliminar.setFont(new Font("Roboto", Font.PLAIN, 18));
 		lblEliminar.setBounds(0, 0, 122, 35);
 		btnEliminar.add(lblEliminar);
+		lblEliminar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int numTabla = panel.getSelectedIndex();
+				
+				switch( numTabla ) {
+				case 0:
+					eliminarReserva();
+					tbReservas.clearSelection();
+					limpiarTabla(modelo);
+					cargarTbReservas();
+					break;
+				case 1:
+					eliminarHuesped();
+					tbHuespedes.clearSelection();
+					limpiarTabla(modeloHuesped);
+					cargarTbHuespedes();
+					break;
+				}
+			}
+		});
 		setResizable(false);
 	}
 	
@@ -410,29 +431,38 @@ public class Busqueda extends JFrame {
 	
 	
 	private void actualizarReservas() {
-		Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())).ifPresent( celda -> {
-			Integer id = Integer.valueOf( modelo.getValueAt(tbReservas.getSelectedRow(), 0).toString() );
-			LocalDate fEntrada = LocalDate.parse( modelo.getValueAt(tbReservas.getSelectedRow(), 1).toString() );
-			LocalDate fSalida = LocalDate.parse( modelo.getValueAt(tbReservas.getSelectedRow(), 2).toString() );
-			Double valor = recalcularValorReserva( fEntrada, fSalida );
-			String formaPago = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 4);
-			if( tbReservas.getSelectedColumn() == 0 ) {
-				JOptionPane.showMessageDialog(null, "Reserva - No se pueden editar los ID",
-						"¡No se pueden editar los ID!", JOptionPane.WARNING_MESSAGE);
-			}else if( valor < 0 ) {
-				JOptionPane.showMessageDialog(null, "Reserva - La fecha de CheckOut no puede ser posterior a la fecha de CheckIn",
-						"¡Error en las fechas!", JOptionPane.WARNING_MESSAGE);
-			}else {
-				this.reservaController.actualizar(Date.valueOf(fEntrada), Date.valueOf(fSalida), valor, formaPago, id);
-				JOptionPane.showMessageDialog(null, String.format( "Registro modificado con exito para la reserva: " + id ),
-						"¡Registro modificado con exito!", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
+		if( tbReservas.getSelectedRow() < 0 || tbReservas.getSelectedRow() < 0 ) {
+			JOptionPane.showMessageDialog(null, "Reserva - Por favor, seleccione un registro",
+					"¡Error, debe seleccionar un registro!", JOptionPane.WARNING_MESSAGE);
+		}else {
+			Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())).ifPresent( celda -> {
+				Integer id = Integer.valueOf( modelo.getValueAt(tbReservas.getSelectedRow(), 0).toString() );
+				LocalDate fEntrada = LocalDate.parse( modelo.getValueAt(tbReservas.getSelectedRow(), 1).toString() );
+				LocalDate fSalida = LocalDate.parse( modelo.getValueAt(tbReservas.getSelectedRow(), 2).toString() );
+				Double valor = recalcularValorReserva( fEntrada, fSalida );
+				String formaPago = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 4);
+				if( tbReservas.getSelectedColumn() == 0 ) {
+					JOptionPane.showMessageDialog(null, "Reserva - No se pueden editar los ID",
+							"¡No se pueden editar los ID!", JOptionPane.WARNING_MESSAGE);
+				}else if( valor < 0 ) {
+					JOptionPane.showMessageDialog(null, "Reserva - La fecha de CheckOut no puede ser posterior a la fecha de CheckIn",
+							"¡Error en las fechas!", JOptionPane.WARNING_MESSAGE);
+				}else {
+					this.reservaController.actualizar(Date.valueOf(fEntrada), Date.valueOf(fSalida), valor, formaPago, id);
+					JOptionPane.showMessageDialog(null, String.format( "Registro modificado con exito para la reserva: " + id ),
+							"¡Registro modificado con exito!", JOptionPane.INFORMATION_MESSAGE);
+				}
+			});
+		}
 	}
 	
 	
 	private void actualizarHuespedes() {
-		Optional.ofNullable( modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), tbHuespedes.getSelectedColumn()) ).ifPresent( celda ->{
+		if( tbHuespedes.getSelectedRow() < 0 || tbHuespedes.getSelectedRow() < 0 ) {
+			JOptionPane.showMessageDialog(null, "Huésped - Por favor, seleccione un registro",
+					"¡Error, debe seleccionar un registro!", JOptionPane.WARNING_MESSAGE);
+		}else {
+			Optional.ofNullable(modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), tbHuespedes.getSelectedColumn())).ifPresent( celda -> {
 			Integer id = Integer.valueOf( modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 0).toString() );
 			String nombre = (String) modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 1);
 			String apellido = (String) modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 2);
@@ -448,7 +478,53 @@ public class Busqueda extends JFrame {
 				JOptionPane.showMessageDialog(null, String.format( "Registro modificado con exito para el huésped: " + id ),
 						"¡Registro modificado con exito!", JOptionPane.INFORMATION_MESSAGE);
 			}
-		});
+			});
+		}		
+	}
+	
+	
+	private void eliminarReserva() {
+		if( tbReservas.getSelectedRow() < 0 || tbReservas.getSelectedRow() < 0 ) {
+			JOptionPane.showMessageDialog(null, "Reserva - Por favor, seleccione un registro",
+					"¡Error, debe seleccionar un registro!", JOptionPane.WARNING_MESSAGE);
+		}else {
+			Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())).ifPresent( celda ->{
+				Integer id = Integer.valueOf(modelo.getValueAt(tbReservas.getSelectedRow(), 0).toString());
+				int confirmacion = JOptionPane.showConfirmDialog(null, String.format( "Reserva - Desea eliminar la reserva N°: " + id ), 
+						"¿Eliminar la reserva?", JOptionPane.INFORMATION_MESSAGE);
+				if( confirmacion == JOptionPane.YES_OPTION ) {
+					this.huespedController.eliminarPorIdReserva(id);
+					this.reservaController.eliminar(id);
+					modelo.removeRow(tbReservas.getSelectedRow());
+					JOptionPane.showMessageDialog(null, "¡Reserva eliminada con exito!",
+							"Reserva eliminada", JOptionPane.INFORMATION_MESSAGE);
+				}
+				
+			});
+		}
+	}
+	
+	
+	private void eliminarHuesped() {
+		if( tbHuespedes.getSelectedRow() < 0 || tbHuespedes.getSelectedRow() < 0 ) {
+			JOptionPane.showMessageDialog(null, "Huésped - Por favor, seleccione un registro",
+					"¡Error, debe seleccionar un registro!", JOptionPane.WARNING_MESSAGE);
+		}else {
+			Optional.ofNullable(modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), tbHuespedes.getSelectedColumn())).ifPresent( celda ->{
+				Integer id = Integer.valueOf(modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 0).toString());
+				Integer idReserva = Integer.valueOf(modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 6).toString());
+				int confirmacion = JOptionPane.showConfirmDialog(null, String.format( "Huésped - Desea eliminar la información del huésped N°: " + id ), 
+						"¿Eliminar la información del huésped?", JOptionPane.INFORMATION_MESSAGE);
+				if( confirmacion == JOptionPane.YES_OPTION ) {
+					this.huespedController.eliminar(id);
+					this.reservaController.eliminar(idReserva);
+					modeloHuesped.removeRow(tbHuespedes.getSelectedRow());
+					JOptionPane.showMessageDialog(null, "¡Información del huésped eliminada con exito!",
+							"Información del huésped eliminada", JOptionPane.INFORMATION_MESSAGE);
+				}
+				
+			});
+		}
 	}
 	
 	

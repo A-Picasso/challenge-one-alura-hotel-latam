@@ -11,6 +11,7 @@ public class HuespedController {
 	
 	private HuespedDAO huespedDAO;
 
+	
 	public HuespedController() {
 		ConnectionFactory factory = new ConnectionFactory();
 		this.huespedDAO = new HuespedDAO(factory.recuperarConexion());
@@ -37,4 +38,13 @@ public class HuespedController {
 		this.huespedDAO.actualizar(nombre, apellido, fechaNacimiento, nacionalidad, telefono, id);
 	}
 	
+	
+	public void eliminar( Integer id ) {
+		this.huespedDAO.eliminar(id);
+	}
+	
+	
+	public void eliminarPorIdReserva( Integer idReserva ) {
+		this.huespedDAO.eliminarPorIdReserva(idReserva);
+	}
 }

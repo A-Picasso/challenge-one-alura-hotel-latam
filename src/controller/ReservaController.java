@@ -29,7 +29,12 @@ public class ReservaController {
 	}
 	
 	
-	public int actualizar( Date fechaEntrada, Date fechaSalida, Double valor, String formaPago, Integer id ) {
-		return this.reservaDao.actualizar(fechaEntrada, fechaSalida, valor, formaPago, id);
+	public void actualizar( Date fechaEntrada, Date fechaSalida, Double valor, String formaPago, Integer id ) {
+		this.reservaDao.actualizar(fechaEntrada, fechaSalida, valor, formaPago, id);
+	}
+	
+	
+	public void eliminar( Integer id ) {
+		this.reservaDao.eliminar(id);
 	}
 }

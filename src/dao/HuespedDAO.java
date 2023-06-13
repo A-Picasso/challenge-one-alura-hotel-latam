@@ -19,6 +19,7 @@ public class HuespedDAO {
 		this.con = con;
 	}
 	
+	
 	public void guardar( Huesped huesped ) {
 		try {
 			final PreparedStatement statement = con.prepareStatement("INSERT INTO huespedes(id_reserva, nombre, apellido, fecha_nacimiento, nacionalidad, telefono)"
@@ -27,10 +28,11 @@ public class HuespedDAO {
 				registrar( huesped, statement );
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException( e );
+			throw new RuntimeException("Ocurrió una excepción en el método guardar de la clase HuespedDAO: " + e.getMessage(), e);
 		}
 	}
 
+	
 	private void registrar(Huesped huesped, PreparedStatement statement) throws SQLException {
 		statement.setInt(1, huesped.getIdReserva());
 		statement.setString(2, huesped.getNombre());
@@ -65,7 +67,7 @@ public class HuespedDAO {
 				}
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Ocurrió una excepción en el método listar de la clase HuespedDAO: " + e.getMessage(), e);
 		}
 		return listarResultado;
 	}
@@ -88,7 +90,7 @@ public class HuespedDAO {
 				}
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Ocurrió una excepción en el método listarPorApellido de la clase HuespedDAO: " + e.getMessage(), e);
 		}
 		return resultado;
 	}
@@ -114,8 +116,33 @@ public class HuespedDAO {
 				statement.execute();
 			}
 		} catch (SQLException e) {
-			throw new RuntimeException("Ocurrió una excepción en HuespedDao" + e.getMessage(), e);
+			throw new RuntimeException("Ocurrió una excepción en el método actualizar de la clase HuespedDAO: " + e.getMessage(), e);
 		}
 	}
 
+	
+	public void eliminar( Integer id ) {
+		try {
+			final PreparedStatement statement = con.prepareStatement("DELETE FROM huespedes WHERE id=?");
+			try( statement ){
+				statement.setInt(1, id);
+				statement.execute();
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Ocurrió una excepción en el método eliminar de la clase HuespedDAO: " + e.getMessage(), e);
+		}
+	}
+	
+	
+	public void eliminarPorIdReserva( Integer idReserva ) {
+		try {
+			final PreparedStatement statement = con.prepareStatement("DELETE FROM huespedes WHERE id_reserva=?");
+			try( statement ){
+				statement.setInt(1, idReserva);
+				statement.execute();
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Ocurrió una excepción en el método eliminarPorIdReserva de la clase HuespedDAO: " + e.getMessage(), e);
+		}
+	}
 }
