@@ -1,5 +1,6 @@
 package controller;
 
+import java.sql.Date;
 import java.util.List;
 
 import dao.ReservaDAO;
@@ -25,5 +26,10 @@ public class ReservaController {
 
 	public List<Reserva> buscarPorId( String id ){
 		return this.reservaDao.buscarPorId(id);
+	}
+	
+	
+	public int actualizar( Date fechaEntrada, Date fechaSalida, Double valor, String formaPago, Integer id ) {
+		return this.reservaDao.actualizar(fechaEntrada, fechaSalida, valor, formaPago, id);
 	}
 }

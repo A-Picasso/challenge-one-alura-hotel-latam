@@ -1,5 +1,6 @@
 package controller;
 
+import java.sql.Date;
 import java.util.List;
 
 import dao.HuespedDAO;
@@ -28,6 +29,12 @@ public class HuespedController {
 	
 	public List<Huesped> listarPorApellido( String apellido ){
 		return this.huespedDAO.listarPorApellido(apellido);
+	}
+	
+	
+	public void actualizar( String nombre, String apellido, Date fechaNacimiento, 
+			String nacionalidad, String telefono,  Integer id ) {
+		this.huespedDAO.actualizar(nombre, apellido, fechaNacimiento, nacionalidad, telefono, id);
 	}
 	
 }

@@ -1,6 +1,7 @@
 package dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -90,6 +91,31 @@ public class HuespedDAO {
 			throw new RuntimeException(e);
 		}
 		return resultado;
+	}
+	
+	
+	public void actualizar(String nombre, String apellido, Date fechaNacimiento, 
+			String nacionalidad, String telefono,  Integer id ) {
+		try {
+			final PreparedStatement statement = con.prepareStatement("UPDATE huespedes SET " + 
+												"nombre=?, " + 
+												"apellido=?, " + 
+												"fecha_nacimiento=?, " + 
+												"nacionalidad=?, " + 
+												"telefono=? " + 
+												"WHERE id=?");
+			try( statement ){
+				statement.setString(1, nombre);
+				statement.setString(2, apellido);
+				statement.setDate(3, fechaNacimiento);
+				statement.setString(4, nacionalidad);
+				statement.setString(5, telefono);
+				statement.setInt(6, id);
+				statement.execute();
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Ocurrió una excepción en HuespedDao" + e.getMessage(), e);
+		}
 	}
 
 }

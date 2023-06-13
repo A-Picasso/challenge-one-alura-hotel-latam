@@ -1,6 +1,7 @@
 package dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -87,6 +88,31 @@ public class ReservaDAO {
 			throw new RuntimeException(e);
 		}
 		return resultadoId;
+	}
+	
+	public int actualizar( Date fechaEntrada, Date fechaSalida, Double valor, String formaPago, Integer id ) {
+		try {
+			final PreparedStatement statement = con.prepareStatement(
+												"UPDATE reservas SET " + 
+												"fecha_entrada=?, " + 
+												"fecha_salida=?, " + 
+												"valor=?, " + 
+												"forma_pago=? " + 
+												"WHERE id=?");
+			try( statement ){
+				statement.setDate(1, fechaEntrada);
+				statement.setDate(2, fechaSalida);
+				statement.setDouble(3, valor);
+				statement.setString(4, formaPago);
+				statement.setInt(5, id);
+				statement.execute();
+				
+				int contadorActualizaciones = statement.getUpdateCount();
+				return contadorActualizaciones;
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException("Ocurrió una excepción en ReservaDao" + e.getMessage(), e);
+		}
 	}
 
 }

@@ -22,6 +22,7 @@ import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Optional;
 import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
 import java.awt.Toolkit;
@@ -31,6 +32,9 @@ import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.awt.event.KeyAdapter;
 
 @SuppressWarnings("serial")
@@ -46,6 +50,7 @@ public class Busqueda extends JFrame {
 	private JLabel labelExit;
 	private ReservaController reservaController;
 	private HuespedController huespedController;
+	private int estadia = 1000;
 	int xMouse, yMouse;
 
 	/**
@@ -321,6 +326,27 @@ public class Busqueda extends JFrame {
 		btnEditar.setBackground(new Color(12, 138, 199));
 		btnEditar.setBounds(635, 508, 122, 35);
 		btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		btnEditar.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int numTabla = panel.getSelectedIndex();
+				
+				switch( numTabla ) {
+				case 0:
+					actualizarReservas();
+					tbReservas.clearSelection();
+					limpiarTabla(modelo);
+					cargarTbReservas();
+					break;
+				case 1:
+					actualizarHuespedes();
+					tbHuespedes.clearSelection();
+					limpiarTabla(modeloHuesped);
+					cargarTbHuespedes();
+					break;
+				}
+			}
+		});
 		contentPane.add(btnEditar);
 		
 		JLabel lblEditar = new JLabel("EDITAR");
@@ -381,6 +407,60 @@ public class Busqueda extends JFrame {
 				huesped.getNacionalidad(), huesped.getTelefono(), huesped.getIdReserva()
 		}) );
 	}
+	
+	
+	private void actualizarReservas() {
+		Optional.ofNullable(modelo.getValueAt(tbReservas.getSelectedRow(), tbReservas.getSelectedColumn())).ifPresent( celda -> {
+			Integer id = Integer.valueOf( modelo.getValueAt(tbReservas.getSelectedRow(), 0).toString() );
+			LocalDate fEntrada = LocalDate.parse( modelo.getValueAt(tbReservas.getSelectedRow(), 1).toString() );
+			LocalDate fSalida = LocalDate.parse( modelo.getValueAt(tbReservas.getSelectedRow(), 2).toString() );
+			Double valor = recalcularValorReserva( fEntrada, fSalida );
+			String formaPago = (String) modelo.getValueAt(tbReservas.getSelectedRow(), 4);
+			if( tbReservas.getSelectedColumn() == 0 ) {
+				JOptionPane.showMessageDialog(null, "Reserva - No se pueden editar los ID",
+						"¡No se pueden editar los ID!", JOptionPane.WARNING_MESSAGE);
+			}else if( valor < 0 ) {
+				JOptionPane.showMessageDialog(null, "Reserva - La fecha de CheckOut no puede ser posterior a la fecha de CheckIn",
+						"¡Error en las fechas!", JOptionPane.WARNING_MESSAGE);
+			}else {
+				this.reservaController.actualizar(Date.valueOf(fEntrada), Date.valueOf(fSalida), valor, formaPago, id);
+				JOptionPane.showMessageDialog(null, String.format( "Registro modificado con exito para la reserva: " + id ),
+						"¡Registro modificado con exito!", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+	}
+	
+	
+	private void actualizarHuespedes() {
+		Optional.ofNullable( modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), tbHuespedes.getSelectedColumn()) ).ifPresent( celda ->{
+			Integer id = Integer.valueOf( modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 0).toString() );
+			String nombre = (String) modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 1);
+			String apellido = (String) modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 2);
+			LocalDate fechaNacimiento = LocalDate.parse( modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 3).toString() );
+			String nacionalidad = (String) modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 4);
+			String telefono = (String) modeloHuesped.getValueAt(tbHuespedes.getSelectedRow(), 5);
+			
+			if( tbHuespedes.getSelectedColumn() == 0 || tbHuespedes.getSelectedColumn() == 6 ) {
+				JOptionPane.showMessageDialog(null, "Huésped - No se pueden editar los ID",
+						"¡No se pueden editar los ID!", JOptionPane.WARNING_MESSAGE);
+			}else {
+				this.huespedController.actualizar(nombre, apellido, Date.valueOf(fechaNacimiento), nacionalidad, telefono, id);
+				JOptionPane.showMessageDialog(null, String.format( "Registro modificado con exito para el huésped: " + id ),
+						"¡Registro modificado con exito!", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+	}
+	
+	
+	private Double recalcularValorReserva(LocalDate fE, LocalDate fS) {
+		if( fE !=null && fS !=null ) {
+			int dias = (int) ChronoUnit.DAYS.between(fE, fS);
+			Double valor = (double) (dias * estadia);
+			return valor;
+		}
+		return null;
+	}
+
 	
 	private void limpiarBuscador() {
 		txtBuscar.setText("");

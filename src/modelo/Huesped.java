@@ -34,6 +34,7 @@ public class Huesped {
 		this.telefono = telefono;
 		this.idReserva = idReserva;
 	}
+	
 
 
 	public Integer getId() {
