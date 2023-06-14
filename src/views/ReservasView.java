@@ -1,6 +1,5 @@
 package views;
 
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -11,18 +10,12 @@ import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.JTextField;
 import com.toedter.calendar.JDateChooser;
-
 import controller.ReservaController;
 import modelo.Reserva;
-
 import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
-
 import java.text.DecimalFormat;
-import java.text.Format;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -52,22 +45,6 @@ public class ReservasView extends JFrame {
 	private int estadia = 1000;
 	
 	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ReservasView frame = new ReservasView();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
 	/**
 	 * Create the frame.
 	 */
@@ -304,12 +281,12 @@ public class ReservasView extends JFrame {
 		txtValor.setColumns(10);
 
 
-		txtFormaPago = new JComboBox();
+		txtFormaPago = new JComboBox<String>();
 		txtFormaPago.setBounds(68, 417, 289, 38);
 		txtFormaPago.setBackground(SystemColor.text);
 		txtFormaPago.setBorder(new LineBorder(new Color(255, 255, 255), 1, true));
 		txtFormaPago.setFont(new Font("Roboto", Font.PLAIN, 16));
-		txtFormaPago.setModel(new DefaultComboBoxModel(new String[] {"Tarjeta de Crédito", "Tarjeta de Débito", "Dinero en efectivo"}));
+		txtFormaPago.setModel(new DefaultComboBoxModel<String>(new String[] {"Tarjeta de Crédito", "Tarjeta de Débito", "Dinero en efectivo"}));
 		panel.add(txtFormaPago);
 
 		JPanel btnsiguiente = new JPanel();

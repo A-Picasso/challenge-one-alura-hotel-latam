@@ -1,6 +1,5 @@
 package views;
 
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -12,18 +11,14 @@ import modelo.Huesped;
 import modelo.Reserva;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import java.awt.Color;
-import java.awt.SystemColor;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import java.awt.Font;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Optional;
-import java.awt.event.ActionEvent;
 import javax.swing.JTabbedPane;
 import java.awt.Toolkit;
 import javax.swing.SwingConstants;
@@ -53,22 +48,7 @@ public class Busqueda extends JFrame {
 	private int estadia = 1000;
 	int xMouse, yMouse;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Busqueda frame = new Busqueda();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	
 	/**
 	 * Create the frame.
 	 */

@@ -1,12 +1,9 @@
 package views;
 
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import controller.UsuarioController;
-
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,9 +20,6 @@ import java.awt.event.MouseMotionAdapter;
 
 public class Login extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtUsuario;
@@ -34,22 +28,7 @@ public class Login extends JFrame {
 	private JLabel labelExit;
 	private UsuarioController usuarioController;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Login frame = new Login();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	
 	/**
 	 * Create the frame.
 	 */
@@ -196,7 +175,7 @@ public class Login extends JFrame {
 			}
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				Login();
+				login();
 			}
 		});
 		btnLogin.setBackground(SystemColor.textHighlight);
@@ -238,7 +217,7 @@ public class Login extends JFrame {
 		header.setLayout(null);
 	}
 	
-	private void Login() {
+	private void login() {
 		 String usuario= txtUsuario.getText();
 	     String contrasena=new String(txtContrasena.getPassword());
 	     
