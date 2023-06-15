@@ -8,6 +8,7 @@ import javax.swing.JTextField;
 import java.awt.Color;
 import com.toedter.calendar.JDateChooser;
 import controller.HuespedController;
+import controller.ReservaController;
 import modelo.Huesped;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -37,6 +38,7 @@ public class RegistroHuesped extends JFrame {
 	private JLabel labelExit;
 	private JLabel labelAtras;
 	private HuespedController huespedController;
+	private ReservaController reservaController; 
 	int xMouse, yMouse;
 
 
@@ -45,6 +47,7 @@ public class RegistroHuesped extends JFrame {
 	 */
 	public RegistroHuesped( int idReserva ) {
 		this.huespedController = new HuespedController();
+		this.reservaController = new ReservaController();
 		setIconImage(Toolkit.getDefaultToolkit().getImage(RegistroHuesped.class.getResource("/imagenes/lOGO-50PX.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 910, 634);
@@ -81,9 +84,14 @@ public class RegistroHuesped extends JFrame {
 		btnAtras.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ReservasView reservas = new ReservasView();
-				reservas.setVisible(true);
-				dispose();				
+				int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea cancelar la reserva anterior?", 
+						"¿Cancelar la reserva?", JOptionPane.INFORMATION_MESSAGE);
+				if( confirmacion == JOptionPane.YES_OPTION ) {
+					eliminarReserva(idReserva);
+					ReservasView reservas = new ReservasView();
+					reservas.setVisible(true);
+					dispose();	
+				}			
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -276,9 +284,15 @@ public class RegistroHuesped extends JFrame {
 		btnexit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				MenuPrincipal principal = new MenuPrincipal();
-				principal.setVisible(true);
-				dispose();
+				int confirmacion = JOptionPane.showConfirmDialog(null, "¿Desea cancelar su registro?", 
+						"¿Cancelar su registro?", JOptionPane.INFORMATION_MESSAGE);
+				if( confirmacion == JOptionPane.YES_OPTION ) {
+					eliminarReserva(idReserva);
+					JOptionPane.showMessageDialog(null, "Registro cancelado");
+					MenuPrincipal principal = new MenuPrincipal();
+					principal.setVisible(true);
+					dispose();
+				}
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -321,6 +335,10 @@ public class RegistroHuesped extends JFrame {
 		}
 	}
 
+	
+	private void eliminarReserva( int id ) {
+			this.reservaController.eliminar(Integer.valueOf(id));
+	}
 	
 	//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"	
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {

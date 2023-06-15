@@ -16,6 +16,7 @@ import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -312,13 +313,19 @@ public class ReservasView extends JFrame {
 	}
 	
 	private void valorDeReserva(JDateChooser fechaEntrada, JDateChooser fechaSalida) {
+		JDateChooser fechaActual = new JDateChooser(Calendar.getInstance().getTime());
+		String fActual = new SimpleDateFormat("yyyy-MM-dd").format(fechaActual.getDate());
 		
 		if(fechaEntrada.getDate() !=null && fechaSalida.getDate() !=null ) {
 			if(fechaEntrada.getDate().after(fechaSalida.getDate())) {
 				JOptionPane.showMessageDialog(null, "La fecha de CheckOut no puede ser posterior a la fecha de CheckIn",
 						"Error en las fechas", JOptionPane.ERROR_MESSAGE);
-				fechaEntrada.setDate(null);
-				fechaSalida.setDate(null);
+				limpiarTxtFechas(fechaEntrada, fechaSalida);
+				return;
+			}else if( fechaActual.getDate().after(fechaEntrada.getDate()) ) {
+				JOptionPane.showMessageDialog(null, "La fecha de CheckIn no puede ser posterior a la fecha actual: " + fActual,
+						"Error en la fecha de entrada", JOptionPane.ERROR_MESSAGE);
+				limpiarTxtFechas(fechaEntrada, fechaSalida);
 				return;
 			}
 						
@@ -348,6 +355,12 @@ public class ReservasView extends JFrame {
 		RegistroHuesped registro = new RegistroHuesped(nuevaReserva.getId());
 		registro.setVisible(true);
 		dispose();
+	}
+	
+	
+	private void limpiarTxtFechas(JDateChooser fechaEntrada, JDateChooser fechaSalida) {
+		fechaEntrada.setDate(null);
+		fechaSalida.setDate(null);
 	}
 	
 	
